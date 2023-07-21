@@ -1,2 +1,1 @@
 # AskPlugin
-composer dump-autoload
