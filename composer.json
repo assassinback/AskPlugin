@@ -1,0 +1,17 @@
+{
+    "name": "blossomheaven/askportal",
+    "description": "Ask Portal",
+    "type": "project",
+    "license": "GPL",
+    "authors": [
+        {
+            "name": "Zia-ur-Rehman Khan",
+            "email": "ziakhan1198@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload":{
+       "psr-4":{"Inc\\":"./inc"} 
+    }
+}
