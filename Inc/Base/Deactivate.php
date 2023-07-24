@@ -1,8 +1,8 @@
 <?php
-namespace Inc;
 /**
  * @package Ask_Portal
  */
+namespace Inc\Base;
 
 //Deactivate Plugin
 class Deactivate

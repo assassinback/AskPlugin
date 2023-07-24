@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @package Ask_Portal
+ */
 
 if(!defined("WP_UNINSTALL_PLUGIN"))
 {

@@ -2,7 +2,7 @@
 /**
  * @package Ask_Portal
  */
-namespace Inc;
+namespace Inc\Base;
 //Activate Plugin
 class Activate
 {
