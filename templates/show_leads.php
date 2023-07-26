@@ -10,3 +10,5 @@ class show_leads
         echo "<h1>Show Leads</h1>";
     }
 }
+?>
+<h1>Show Leads</h1>
