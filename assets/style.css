@@ -1,0 +1,7 @@
+.card.mb-12 {
+    width: 2000px !important;
+    max-width: 2000px !important;
+}
+table,th,tr,td{
+    border: 1px !important;
+}

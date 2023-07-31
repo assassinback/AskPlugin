@@ -16,11 +16,13 @@ class Admin
     //Initialize Admin Dashboard and Page
     public function register()
     {
-        // add_action('admin_menu',array($this,'add_admin_pages'));
         $this->settings=new SettingsApi();
         $this->callbacks=new AdminCallbacks();
         $this->SetPages();
         $this->SetSubpages();
+        $this->setSettings();
+        $this->setSections();
+        $this->setFields();
         $this->settings->AddPages($this->pages)->withSubPage('Dashboard')->addSubPages($this->subpages)->register();
         
     }
@@ -76,17 +78,44 @@ class Admin
             ),
         );
     }
-    // public function add_admin_pages()
-    // {
-    //     add_menu_page("Dashboard","AskPortal",'manage_options',"Dashboard",array($this,'admin_dashboard'),'dashicons-table-row-after
-    //     ',2);
-    // }
-    // public function admin_dashboard()
-    // {
-    //     // require_once $this->plugin_url."/templates/show_leads.php";
-    //     // echo $this->plugin_url."/templates/show_leads.php";
-    //     show_leads::heading();
-    //     // $leads=new show_leads();
-    //     // $leads.heading();
-    // }
+    public function setSettings()
+    {
+        $args=array(
+            array(
+                'option_group'=>'portal_options_group',
+                'option_name'=>'show_leads',
+                'callback'=>array($this->callbacks,'askOptionsGroup')
+            )
+        );
+        $this->settings->addSettings($args);
+    }
+    public function setSections()
+    {
+        $args=array(
+            array(
+                'id'=>'portal_admin_index',
+                'title'=>'Settings',
+                'callback'=>array($this->callbacks,'askAdminSection'),
+                'page'=>'Ask_Portal',
+            )
+        );
+        $this->settings->addSection($args);
+    }
+    public function setFields()
+    {
+        $args=array(
+            array(
+                'id'=>'show_leads',
+                'title'=>'Show Leads',
+                'callback'=>array($this->callbacks,'askTextExample'),
+                'page'=>'Ask_Portal',
+                'section'=>'portal_admin_index',
+                'args'=>array(
+                    'label_for'=>'text_example',
+                    'class'=>'example-class'
+                    )
+            )
+        );
+        $this->settings->addFields($args);
+    }
 }
