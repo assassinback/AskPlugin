@@ -2,6 +2,18 @@
     width: 2000px !important;
     max-width: 2000px !important;
 }
-table,th,tr,td{
-    border: 1px !important;
+table, th, td {
+    border: 1px solid black !important;
 }
+div#wpfooter {
+    display: none;
+}
+.clickedrow
+{
+    background-color: #EEEEEE;
+}
+/* .btn:not([class*="btn-outline-"]) {
+    border: 0;
+    margin-left: 20px;
+    background-color: burlywood;
+} */
