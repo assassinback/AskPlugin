@@ -5,6 +5,8 @@
 
 namespace Inc\Api;
 
+use wpdb;
+
 class Functions
 {
     function insertData($table="", $data=array()) {
@@ -418,20 +420,22 @@ class Functions
     }
     function get_follow_up_data()
     {
+        global $wpdb;
+        $prefix=$wpdb->prefix;
+        
         global $db, $dbPrefix, $list;
         $query="SELECT in_process.insert_admin,in_process.ask_email,in_process.id,in_process.case_assign_date,in_process.name,in_process.phone,in_process.email
         ,des1.destination_name as dest_1,cou1.consultant_name,in_process.comments,fee1.status_name,in_process.admin,in_process.university_1,in_process.outcome_destination_1,case_status1.status_name as case_status_1,des2.destination_name as dest_2,
         in_process.case_handler_2,in_process.intake,in_process.university_2,in_process.outcome_destination_2,case_status2.status_name as case_status_2,in_process.course,in_process.case_handler_2,in_process.missing_docs,in_process.final_comments 
-        FROM in_process as in_process 
-        INNER JOIN destination as des1 ON in_process.destination_1=des1.id
-        INNER JOIN destination as des2 ON in_process.destination_2=des2.id
-        INNER JOIN consultant as cou1 ON in_process.counselor=cou1.id 
-        INNER JOIN case_status as case_status1 ON in_process.case_status_1=case_status1.id 
-        INNER JOIN case_status as case_status2 ON in_process.case_status_2=case_status2.id 
-        INNER JOIN fee_status as fee1 ON in_process.fee_status=fee1.id WHERE in_process.enabled=1;";
-        $result=$db->query($query);
-        $row=$result->result_array();
-        return $row;
+        FROM {$prefix}in_process as in_process 
+        INNER JOIN {$prefix}destination as des1 ON in_process.destination_1=des1.id
+        INNER JOIN {$prefix}destination as des2 ON in_process.destination_2=des2.id
+        INNER JOIN {$prefix}consultant as cou1 ON in_process.counselor=cou1.id 
+        INNER JOIN {$prefix}case_status as case_status1 ON in_process.case_status_1=case_status1.id 
+        INNER JOIN {$prefix}case_status as case_status2 ON in_process.case_status_2=case_status2.id 
+        INNER JOIN {$prefix}fee_status as fee1 ON in_process.fee_status=fee1.id WHERE in_process.enabled=1;";
+        $result=$wpdb->get_results($query);
+        return $result;
     }
     function get_single_follow_up_data($id=0)
     {
@@ -524,7 +528,11 @@ class Functions
         // return $row;
     }
     function selectData($table="",$where="", $data=array()) {
-        global $db, $dbPrefix, $list;
+        global $wpdb;
+
+        $prefix=$wpdb->prefix;
+        
+        // $row=$result->result_array();
         
         if ($table == "") {
             return false;
@@ -538,23 +546,23 @@ class Functions
             }
             $columns = implode(', ', $columns);
         }
-        $sql = 'SELECT * FROM ' . $dbPrefix . $table;
+        $sql = 'SELECT * FROM ' . $prefix . $table;
         
         if ($where != "") {
             $sql .= ' WHERE ' . $where; 
         }
         if($data==null)
         {
-            $update = $db->query($sql);
+            $result=$wpdb->get_results($sql);
         }
         else
         {
-            $update = $db->query($sql, $values);
+            $result=$wpdb->get_results($sql);
         }
         
         //echo $db->last_query();
-        $row=$update->result_array();
-        return $row;
+        return $result;
+        
     }
     function selectNumRows($table="",$where="", $data=array()) {
         global $db, $dbPrefix, $list;
@@ -703,11 +711,11 @@ class Functions
     <div class='table-responsive p-0'><table class='table align-items-center mb-0'>";
         echo "<thead><tr>";
     echo "<th class='text-center text-uppercase text-xs font-weight-bolder opacity-10'>S.No</th>";
-    if($this->checkPrivilage($_SESSION["user_type"],"admin") || $this->checkPrivilage($_SESSION["user_type"],"accounts") || $this->checkPrivilage($_SESSION["user_type"],"case_admin"))
-    {
+    // if($this->checkPrivilage($_SESSION["user_type"],"admin") || $this->checkPrivilage($_SESSION["user_type"],"accounts") || $this->checkPrivilage($_SESSION["user_type"],"case_admin"))
+    // {
     echo "<th class='text-center text-uppercase text-xs font-weight-bolder opacity-10'>Update</th>";
     
-    }
+    // }
     echo "<th class='text-center text-uppercase text-xs font-weight-bolder opacity-10'>Follow Up Data</th>";
     
     echo "<th class='text-center text-uppercase text-xs font-weight-bolder opacity-10'>Case Assign Date</th>";
@@ -733,15 +741,15 @@ class Functions
     echo "<th class='text-center text-uppercase text-xs font-weight-bolder opacity-10'>Missing Documents</th>";
     echo "<th class='text-center text-uppercase text-xs font-weight-bolder opacity-10'>Final Comments</th>";
     echo "<th class='text-center text-uppercase text-xs font-weight-bolder opacity-10'>Insertion Admin</th>";
-    if($this->checkPrivilage($_SESSION["user_type"],"admin") || $this->checkPrivilage($_SESSION["user_type"],"accounts") || $this->checkPrivilage($_SESSION["user_type"],"case_admin"))
-    {
+    // if($this->checkPrivilage($_SESSION["user_type"],"admin") || $this->checkPrivilage($_SESSION["user_type"],"accounts") || $this->checkPrivilage($_SESSION["user_type"],"case_admin"))
+    // {
         echo "<th class='text-center text-uppercase text-xs font-weight-bolder opacity-10'>Delete</th>";
         
-    }
-    if($this->checkPrivilage($_SESSION["user_type"],"admin") || $this->checkPrivilage($_SESSION["user_type"],"counsellor"))
-    {
+    // }
+    // if($this->checkPrivilage($_SESSION["user_type"],"admin") || $this->checkPrivilage($_SESSION["user_type"],"counsellor"))
+    // {
         echo "<th class='text-center text-uppercase text-xs font-weight-bolder opacity-10'>Send Back to Leads</th>";
-    }
+    // }
     echo "<th class='text-center text-uppercase text-xs font-weight-bolder opacity-10'>Send to Completed</th>";
     echo "</tr></thead>";
     }
@@ -750,47 +758,47 @@ class Functions
         foreach($user_data as $rows)
         {
             echo "<tr>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['id']."</td>";
-            if($this->checkPrivilage($_SESSION["user_type"],"admin") || $this->checkPrivilage($_SESSION["user_type"],"accounts") || $this->checkPrivilage($_SESSION["user_type"],"case_admin"))
-            {
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='update_inproces.php'><input type='hidden' name='update' value='".$rows['id']."'><input type='submit' name='update_btn' value='Update' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->id."</td>";
+            // if($this->checkPrivilage($_SESSION["user_type"],"admin") || $this->checkPrivilage($_SESSION["user_type"],"accounts") || $this->checkPrivilage($_SESSION["user_type"],"case_admin"))
+            // {
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='update_inproces.php'><input type='hidden' name='update' value='".$rows->id."'><input type='submit' name='update_btn' value='Update' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
             
-            }
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='follow_up_inprocess.php'><input type='hidden' name='follow' value='".$rows['id']."'><input type='submit' name='follow_btn' value='Follow Up' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
+            // }
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='follow_up_inprocess.php'><input type='hidden' name='follow' value='".$rows->id."'><input type='submit' name='follow_btn' value='Follow Up' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
             
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['case_assign_date']."</td>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['name']."</td>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['phone']."</td>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['email']."</td>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['ask_email']."</td>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['dest_1']."</td>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['consultant_name']."</td>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['comments']."</td>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['status_name']."</td>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['admin']."</td>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['university_1']."</td>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['outcome_destination_1']."</td>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['case_status_1']."</td>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['dest_2']."</td>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['case_handler_2']."</td>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['university_2']."</td>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['outcome_destination_2']."</td>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['case_status_2']."</td>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['course']."</td>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['intake']."</td>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['missing_docs']."</td>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['final_comments']."</td>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['insert_admin']."</td>";
-            if($this->checkPrivilage($_SESSION["user_type"],"admin") || $this->checkPrivilage($_SESSION["user_type"],"accounts") || $this->checkPrivilage($_SESSION["user_type"],"case_admin"))
-            {
-                echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='delete_inproces.php'><input type='hidden' name='delete' value='".$rows['id']."'><input type='submit' name='delete_btn' value='Delete' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
-                echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='send_back_to_leads.php'><input type='hidden' name='send_back' value='".$rows['id']."'><input type='submit' name='send_back_btn' value='Send Back to Leads' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
-            }
-            if($this->checkPrivilage($_SESSION["user_type"],"admin") || $this->checkPrivilage($_SESSION["user_type"],"counsellor"))
-            {
-                echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='send_back_to_leads.php'><input type='hidden' name='send_back' value='".$rows['id']."'><input type='submit' name='send_back_btn' value='Send Back to Leads' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
-            }
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='send_to_completed.php'><input type='hidden' name='completed' value='".$rows['id']."'><input type='submit' name='completed_btn' value='Send to Completed' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->case_assign_date."</td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->name."</td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->phone."</td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->email."</td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->ask_email."</td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->dest_1."</td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->consultant_name."</td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->comments."</td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->status_name."</td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->admin."</td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->university_1."</td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->outcome_destination_1."</td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->case_status_1."</td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->dest_2."</td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->case_handler_2."</td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->university_2."</td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->outcome_destination_2."</td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->case_status_2."</td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->course."</td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->intake."</td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->missing_docs."</td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->final_comments."</td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->insert_admin."</td>";
+            // if($this->checkPrivilage($_SESSION["user_type"],"admin") || $this->checkPrivilage($_SESSION["user_type"],"accounts") || $this->checkPrivilage($_SESSION["user_type"],"case_admin"))
+            // {
+                echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='delete_inproces.php'><input type='hidden' name='delete' value='".$rows->id."'><input type='submit' name='delete_btn' value='Delete' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
+                echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='send_back_to_leads.php'><input type='hidden' name='send_back' value='".$rows->id."'><input type='submit' name='send_back_btn' value='Send Back to Leads' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
+            // }
+            // if($this->checkPrivilage($_SESSION["user_type"],"admin") || $this->checkPrivilage($_SESSION["user_type"],"counsellor"))
+            // {
+                // echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='send_back_to_leads.php'><input type='hidden' name='send_back' value='".$rows->id."'><input type='submit' name='send_back_btn' value='Send Back to Leads' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
+            // }
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='send_to_completed.php'><input type='hidden' name='completed' value='".$rows->id."'><input type='submit' name='completed_btn' value='Send to Completed' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
             echo "</tr>";
         }
         
@@ -829,25 +837,25 @@ class Functions
         foreach($user_data as $rows)
     {
         echo "<tr>";
-        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['id']."</td>";
-        echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='update_completed.php'><input type='hidden' name='update' value='".$rows['id']."'><input type='submit' name='update_btn' value='Update' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
+        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->id."</td>";
+        echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='update_completed.php'><input type='hidden' name='update' value='".$rows->id."'><input type='submit' name='update_btn' value='Update' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
         
-        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['date']."</td>";
-        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['full_name']."</td>";
-        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['phone']."</td>";
-        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['country']."</td>";
-        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['course']."</td>";
-        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['university']."</td>";
-        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['consultant']."</td>";
-        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['brand']."</td>";
-        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['intake']."</td>";
-        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['notes']."</td>";
-        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['visa_status']."</td>";
-        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['comments']."</td>";
-        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows['insert_admin']."</td>";
+        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->date."</td>";
+        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->full_name."</td>";
+        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->phone."</td>";
+        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->country."</td>";
+        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->course."</td>";
+        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->university."</td>";
+        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->consultant."</td>";
+        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->brand."</td>";
+        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->intake."</td>";
+        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->notes."</td>";
+        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->visa_status."</td>";
+        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->comments."</td>";
+        echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->insert_admin."</td>";
         
-        echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='delete_completed.php'><input type='hidden' name='delete' value='".$rows['id']."'><input type='submit' name='delete_btn' value='Delete' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";   
-        echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='send_back_to_inprocess.php'><input type='hidden' name='send_back' value='".$rows['id']."'><input type='submit' name='send_back_btn' value='Send Back To Inprocess' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";   
+        echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='delete_completed.php'><input type='hidden' name='delete' value='".$rows->id."'><input type='submit' name='delete_btn' value='Delete' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";   
+        echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='send_back_to_inprocess.php'><input type='hidden' name='send_back' value='".$rows->id."'><input type='submit' name='send_back_btn' value='Send Back To Inprocess' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";   
         echo "</tr>";
     }
     echo "</tbody></table></div></div></div></div></div></div>";

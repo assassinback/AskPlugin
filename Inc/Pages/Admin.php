@@ -36,7 +36,7 @@ class Admin
             'menu_title'=>'Ask Portal',
             'capability'=>'manage_options',
             'menu_slug'=>'Ask_Portal',
-            'callback'=>array($this->callbacks,'admin_dashboard'),
+            'callback'=>array($this->callbacks,'show_leads'),
             'icon_url'=>'dashicons-table-row-after',
             'position'=>3,
             )
