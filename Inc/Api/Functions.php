@@ -10,7 +10,51 @@ use wpdb;
 class Functions
 {
     function insertData($table="", $data=array()) {
-        global $db, $dbPrefix, $list;
+        global $wpdb;
+
+        $prefix=$wpdb->prefix;
+        
+        if ($table == "" || count($data) == 0) {
+            return false;
+        }
+        
+        $columns = array();
+        $table_name=$prefix . $table;
+        // $values = array_values($data);
+        foreach ($data as $key=>$value) {
+            // $columns[] = $key . ' = ?';
+            $columns[$key]=$value;
+        }
+        // $columns = implode(', ', $columns);
+        // $format = array('%s','%d');
+        // $sql = 'INSERT INTO ' . $prefix . $table . ' SET ' . $columns;
+        $wpdb->insert($table_name, $columns);
+        //echo $db->last_query();
+        
+        $insert_id = $wpdb->insert_id;
+        return $insert_id;
+    }
+    function insertDataExtra($table="",$name="")
+    {
+        global $wpdb;
+
+        $prefix=$wpdb->prefix;
+        // $table_name=$prefix . $table;
+        $query = 'INSERT INTO ' . $prefix . $table . " VALUES (NULL, '%s', 1)";
+        $sql = $wpdb->prepare($query,$name);
+
+        $wpdb->query($sql);
+        
+        // $wpdb->query($sql);
+        //echo $db->last_query();
+        
+        $insert_id = $wpdb->insert_id;
+        return $insert_id;
+    }
+    function insertData_old($table="", $data=array()) {
+        global $wpdb;
+
+        $prefix=$wpdb->prefix;
         
         if ($table == "" || count($data) == 0) {
             return false;
@@ -22,17 +66,19 @@ class Functions
             $columns[] = $key . ' = ?';
         }
         $columns = implode(', ', $columns);
-        
-        $sql = 'INSERT INTO ' . $dbPrefix . $table . ' SET ' . $columns;
-        $db->query($sql, $values);
+        $format = array('%s','%d');
+        $sql = 'INSERT INTO ' . $prefix . $table . ' SET ' . $columns;
+        $wpdb->insert($sql, $values,$format);
         //echo $db->last_query();
         
-        $insert_id = $db->insert_id();
+        $insert_id = $wpdb->insert_id;
         return $insert_id;
     }
     function maxId($table="",$where="",$data=array())
     {
-        global $db, $dbPrefix, $list;
+        global $wpdb;
+
+        $prefix=$wpdb->prefix;
         
         if ($table == "") {
             return false;
@@ -46,43 +92,34 @@ class Functions
             }
             $columns = implode(', ', $columns);
         }
-        $sql = "SELECT max(id) FROM user_info UNION SELECT max(id) from in_process UNION SELECT max(id) FROM completed;";
+        $sql = "SELECT max(id) as max FROM {$prefix}user_info UNION SELECT max(id)  from {$prefix}in_process UNION SELECT max(id) FROM {$prefix}completed;";
         
         if ($where != "") {
             $sql .= ' WHERE ' . $where; 
         }
         if($data==null)
         {
-            $update = $db->query($sql);
+            $update = $wpdb->get_results($sql);
         }
         else
         {
-            $update = $db->query($sql, $values);
+            $update = $wpdb->get_results($sql);
         }
         
         //echo $db->last_query();
-        $row=$update->result_array();
+        $row=$update;
         $max=0;
+        // var_dump($row);
         foreach($row as $rows)
         {
-            if($max<$rows["max(id)"])
+            if($max<$rows->max)
             {
-                $max=$rows["max(id)"];
+                $max=$rows->max;
             }
         }
         return $max;
     }
-    function insertDataExtra($table="",$name="")
-    {
-        global $db, $dbPrefix, $list;
-        
-        $sql = 'INSERT INTO ' . $dbPrefix . $table . " VALUES (NULL, '$name', 1)";
-        $db->query($sql);
-        //echo $db->last_query();
-        
-        $insert_id = $db->insert_id();
-        return $insert_id;
-    }
+    
     
     function deleteData($table="", $data=array(), $where="") {
         global $db, $dbPrefix, $list;
@@ -565,8 +602,10 @@ class Functions
         
     }
     function selectNumRows($table="",$where="", $data=array()) {
-        global $db, $dbPrefix, $list;
-        
+        // global $db, $dbPrefix, $list;
+        global $wpdb;
+
+        $prefix=$wpdb->prefix;
         if ($table == "") {
             return false;
         }
@@ -579,20 +618,21 @@ class Functions
             }
             $columns = implode(', ', $columns);
         }
-        $sql = 'SELECT * FROM ' . $dbPrefix . $table;
+        $sql = 'SELECT * FROM ' . $prefix . $table;
         
         if ($where != "") {
             $sql .= ' WHERE ' . $where; 
         }
         if($data==null)
         {
-            $update = $db->query($sql);
+            $result=$wpdb->get_results($sql);
         }
         else
         {
-            $update = $db->query($sql, $values);
+            $result=$wpdb->get_results($sql);
         }
-        return $update->num_rows();
+        // echo count($result);
+        return count($result);
     }
     function checkPrivilage($check="",$required="")
     {
