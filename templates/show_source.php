@@ -2,6 +2,17 @@
 $page_name="Show Sources";
 use Inc\Api\Functions;
 $functions=new Functions();
+
+if(isset($_POST["delete"]))
+{
+    $data["enabled"]=0;
+    $functions->disableData("source",$data,"id=".$_POST["delete"]);
+}
+
+
+
+
+
 ?>
 <div class="container-fluid py-4">
       <div class="row">
@@ -29,7 +40,7 @@ echo "</tr></thead>";
     echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->id."</td>";
     echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->source_name."</td>";
     echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='update_source.php'><input type='hidden' name='update' value='".$rows->id."'><input type='submit' name='update_btn' value='Update' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
-    echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='delete_source.php'><input type='hidden' name='delete' value='".$rows->id."'><input type='submit' name='delete_btn' value='Delete' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
+    echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST'><input type='hidden' name='delete' value='".$rows->id."'><input type='submit' name='delete_btn' value='Delete' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
     echo "</tr>";
     }
 

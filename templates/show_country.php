@@ -2,6 +2,11 @@
 $page_name="Show Countries";
 use Inc\Api\Functions;
 $functions=new Functions();
+if(isset($_POST["delete"]))
+{
+    $data["enabled"]=0;
+    $functions->disableData("country",$data,"id=".$_POST["delete"]);
+}
 // if(checkPrivilage($_SESSION["user_type"],"admin"))
 // {
 $outcome=$functions->selectData("country","enabled=1");
@@ -29,7 +34,7 @@ foreach($outcome as $rows)
     echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->id."</td>";
     echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->country_name."</td>";
     echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='update_country.php'><input type='hidden' name='update' value='".$rows->id."'><input type='submit' name='update_btn' value='Update' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
-    echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='delete_country.php'><input type='hidden' name='delete' value='".$rows->id."'><input type='submit' name='delete_btn' value='Delete' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
+    echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST'><input type='hidden' name='delete' value='".$rows->id."'><input type='submit' name='delete_btn' value='Delete' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
     echo "</tr>";
 }
 

@@ -2,6 +2,12 @@
 $page_name="Show Students";
 use Inc\Api\Functions;
 $functions=new Functions();
+
+if(isset($_POST["delete"]))
+{
+    $data["enabled"]=0;
+    $functions->disableData("admin_info",$data,"id=".$_POST["delete"]);
+}
 ?>
 <div class="container-fluid py-4">
       <div class="row">
@@ -36,7 +42,7 @@ foreach($outcome as $rows)
     echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->password."</td>";
     echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->full_name."</td>";
     echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='update_admin.php'><input type='hidden' name='update' value='".$rows->id."'><input type='submit' name='update_btn' value='Update' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
-    echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='delete_admin.php'><input type='hidden' name='delete' value='".$rows->id."'><input type='submit' name='delete_btn' value='Delete' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
+    echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST'><input type='hidden' name='delete' value='".$rows->id."'><input type='submit' name='delete_btn' value='Delete' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
     echo "</tr>";
 }
 echo "</tbody></table></div></div></div></div></div></div>";

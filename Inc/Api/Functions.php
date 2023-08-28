@@ -34,6 +34,34 @@ class Functions
         $insert_id = $wpdb->insert_id;
         return $insert_id;
     }
+    function disableData($table="", $data=array(), $where="") {
+        global $wpdb;
+
+        $prefix=$wpdb->prefix;
+        
+        if ($table == "" || count($data) == 0) {
+            return false;
+        }
+        
+        $columns = array();
+        $table_name=$prefix . $table;
+        foreach ($data as $key=>$value) {
+            // $columns[$key]=$value;\
+            $columns[] = $key . ' = '.$value;
+        }
+        $columns = implode(', ', $columns);
+        $query='UPDATE ' . $prefix . $table . ' SET ' . $columns;
+        if ($where != "") {
+            $query .= ' WHERE ' . $where; 
+        }
+        $sql = $query;
+        
+        
+        $update = $wpdb->query($sql);
+        //echo $db->last_query();
+        
+        return $update;
+    }
     function insertDataExtra($table="",$name="")
     {
         global $wpdb;
@@ -171,30 +199,7 @@ class Functions
         return $update;
     }
     
-    function disableData($table="", $data=array(), $where="") {
-        global $db, $dbPrefix, $list;
-        
-        if ($table == "" || count($data) == 0) {
-            return false;
-        }
-        
-        $columns = array();
-        $values = array_values($data);
-        foreach ($data as $key=>$value) {
-            $columns[] = $key . ' = ?';
-        }
-        $columns = implode(', ', $columns);
-        
-        $sql = 'UPDATE ' . $dbPrefix . $table . ' SET ' . $columns;
-        
-        if ($where != "") {
-            $sql .= ' WHERE ' . $where; 
-        }
-        $update = $db->query($sql, $values);
-        //echo $db->last_query();
-        
-        return $update;
-    }
+    
     
     
     
@@ -735,7 +740,7 @@ class Functions
             echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='send_to_inprocess.php'><input type='hidden' name='inprocess' value='".$rows->main_id."'><input type='submit' name='inprocess_btn' value='Send to Inprocess' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
             // if($this->checkPrivilage($_SESSION["user_type"],"admin") || $this->checkPrivilage($_SESSION["user_type"],"counsellor"))
             // {
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='delete_user.php'><input type='hidden' name='delete' value='".$rows->main_id."'><input type='submit' name='delete_btn' value='Delete' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST'><input type='hidden' name='delete' value='".$rows->main_id."'><input type='submit' name='delete_btn' value='Delete' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
             // }
             echo "</tr>";
         
@@ -831,7 +836,7 @@ class Functions
             echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->insert_admin."</td>";
             // if($this->checkPrivilage($_SESSION["user_type"],"admin") || $this->checkPrivilage($_SESSION["user_type"],"accounts") || $this->checkPrivilage($_SESSION["user_type"],"case_admin"))
             // {
-                echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='delete_inproces.php'><input type='hidden' name='delete' value='".$rows->id."'><input type='submit' name='delete_btn' value='Delete' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
+                echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST'><input type='hidden' name='delete' value='".$rows->id."'><input type='submit' name='delete_btn' value='Delete' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
                 echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='send_back_to_leads.php'><input type='hidden' name='send_back' value='".$rows->id."'><input type='submit' name='send_back_btn' value='Send Back to Leads' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
             // }
             // if($this->checkPrivilage($_SESSION["user_type"],"admin") || $this->checkPrivilage($_SESSION["user_type"],"counsellor"))
@@ -894,7 +899,7 @@ class Functions
         echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->comments."</td>";
         echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->insert_admin."</td>";
         
-        echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='delete_completed.php'><input type='hidden' name='delete' value='".$rows->id."'><input type='submit' name='delete_btn' value='Delete' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";   
+        echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST'><input type='hidden' name='delete' value='".$rows->id."'><input type='submit' name='delete_btn' value='Delete' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";   
         echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='send_back_to_inprocess.php'><input type='hidden' name='send_back' value='".$rows->id."'><input type='submit' name='send_back_btn' value='Send Back To Inprocess' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";   
         echo "</tr>";
     }

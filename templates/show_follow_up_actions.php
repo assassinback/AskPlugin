@@ -2,6 +2,11 @@
 $page_name="Show Follow Up Actions";
 use Inc\Api\Functions;
 $functions=new Functions();
+if(isset($_POST["delete"]))
+{
+    $data["enabled"]=0;
+    $functions->disableData("follow_up_action",$data,"id=".$_POST["delete"]);
+}
 ?>
 <div class="container-fluid py-4">
       <div class="row">
@@ -29,7 +34,7 @@ foreach($outcome as $rows)
     echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->id."</td>";
     echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->action_name."</td>";
     echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='update_follow_up_action.php'><input type='hidden' name='update' value='".$rows->id."'><input type='submit' name='update_btn' value='Update' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
-    echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='delete_follow_up_action.php'><input type='hidden' name='delete' value='".$rows->id."'><input type='submit' name='delete_btn' value='Delete' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
+    echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' ><input type='hidden' name='delete' value='".$rows->id."'><input type='submit' name='delete_btn' value='Delete' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
     echo "</tr>";
 }
 

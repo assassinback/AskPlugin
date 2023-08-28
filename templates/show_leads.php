@@ -4,6 +4,7 @@
  */
 namespace Templates;
 use Inc\Api\Functions;
+
 ?>
 <script>
     if ( window.history.replaceState ) {
@@ -51,6 +52,11 @@ class show_leads
         // var_dump($user);
         $this->makeSessions();
         $functions=new Functions();
+        if(isset($_POST["delete"]))
+{
+    $data["enabled"]=0;
+    $functions->disableData("user_info",$data,"id=".$_POST["delete"]);
+}
         $user_data=$functions->get_all_data($this->min,$this->max);
         $functions->create_forms($this->page_name);
         $functions->show_leads_table();
