@@ -17,6 +17,11 @@ class AdminCallbacks extends BaseController
         $leads=new show_leads();
         $leads->create_page();
     }
+    public function show_extra_data()
+    {
+        // require_once("$this->plugin_path/templates/show_leads.php");
+        require_once("$this->plugin_path/templates/show_extra_data.php");
+    }
     public function show_inprocess()
     {
         require_once("$this->plugin_path/templates/show_inprocess.php");
@@ -49,34 +54,7 @@ class AdminCallbacks extends BaseController
     {
         require_once("$this->plugin_path/templates/show_admins.php");
     }
-    public function show_consultants()
-    {
-        require_once("$this->plugin_path/templates/show_consultants.php");
-    }
-    public function show_country()
-    {
-        require_once("$this->plugin_path/templates/show_country.php");
-    }
-    public function show_follow_up_actions()
-    {
-        require_once("$this->plugin_path/templates/show_follow_up_actions.php");
-    }
-    public function show_inquiry_location()
-    {
-        require_once("$this->plugin_path/templates/show_inquiry_location.php");
-    }
-    public function show_outcome()
-    {
-        require_once("$this->plugin_path/templates/show_outcome.php");
-    }
-    public function show_priority()
-    {
-        require_once("$this->plugin_path/templates/show_priority.php");
-    }
-    public function show_source()
-    {
-        require_once("$this->plugin_path/templates/show_source.php");
-    }
+    
     public function askOptionsGroup($input)
     {
         return $input;

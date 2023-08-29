@@ -129,83 +129,24 @@ class Admin
             array
             (
             'parent_slug'=>'Ask_Portal',
-            'page_title'=>'Show Admins',
-            'menu_title'=>'Show Admins',
+            'page_title'=>'Show Extra Data',
+            'menu_title'=>'Show Extra Data',
             'capability'=>'manage_options',
-            'menu_slug'=>'Show_Admins',
-            'callback'=>array($this->callbacks,'show_admins'),
+            'menu_slug'=>'Show_Extra_Data',
+            'callback'=>array($this->callbacks,'show_extra_data'),
             'position'=>8
             ),
             array
             (
             'parent_slug'=>'Ask_Portal',
-            'page_title'=>'Show Consultants',
-            'menu_title'=>'Show Consultants',
+            'page_title'=>'Show Admins',
+            'menu_title'=>'Show Admins',
             'capability'=>'manage_options',
-            'menu_slug'=>'Show_Consultants',
-            'callback'=>array($this->callbacks,'show_consultants'),
+            'menu_slug'=>'Show_Admins',
+            'callback'=>array($this->callbacks,'show_admins'),
             'position'=>9
             ),
-            array
-            (
-            'parent_slug'=>'Ask_Portal',
-            'page_title'=>'Show Country',
-            'menu_title'=>'Show Country',
-            'capability'=>'manage_options',
-            'menu_slug'=>'Show_Country',
-            'callback'=>array($this->callbacks,'show_country'),
-            'position'=>10
-            ),
-            array
-            (
-            'parent_slug'=>'Ask_Portal',
-            'page_title'=>'Show Follow Up Actions',
-            'menu_title'=>'Show Follow Up Actions',
-            'capability'=>'manage_options',
-            'menu_slug'=>'Show_Follow_Up_Actions',
-            'callback'=>array($this->callbacks,'show_follow_up_actions'),
-            'position'=>11
-            ),
-            array
-            (
-            'parent_slug'=>'Ask_Portal',
-            'page_title'=>'Show Inquiry Location',
-            'menu_title'=>'Show Inquiry Location',
-            'capability'=>'manage_options',
-            'menu_slug'=>'Show_Inquiry_Location',
-            'callback'=>array($this->callbacks,'show_inquiry_location'),
-            'position'=>12
-            ),
-            array
-            (
-            'parent_slug'=>'Ask_Portal',
-            'page_title'=>'Show Outcome',
-            'menu_title'=>'Show Outcome',
-            'capability'=>'manage_options',
-            'menu_slug'=>'Show_Outcome',
-            'callback'=>array($this->callbacks,'show_outcome'),
-            'position'=>13
-            ),
-            array
-            (
-            'parent_slug'=>'Ask_Portal',
-            'page_title'=>'Show Priority',
-            'menu_title'=>'Show Priority',
-            'capability'=>'manage_options',
-            'menu_slug'=>'Show_Priority',
-            'callback'=>array($this->callbacks,'show_priority'),
-            'position'=>14
-            ),
-            array
-            (
-            'parent_slug'=>'Ask_Portal',
-            'page_title'=>'Show Source',
-            'menu_title'=>'Show Source',
-            'capability'=>'manage_options',
-            'menu_slug'=>'Show_Source',
-            'callback'=>array($this->callbacks,'show_source'),
-            'position'=>15
-            ),
+            
         );
     }
     public function setSettings()

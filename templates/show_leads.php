@@ -4,7 +4,35 @@
  */
 namespace Templates;
 use Inc\Api\Functions;
+$functions=new Functions();
+if(isset($_POST["update_btn"]))
+{
+    $new_data["apply_date"]=$_POST["apply_date"];
+    $new_data["priority_id"]=$_POST["priority_id"];
+    $new_data["full_name"]=$_POST["full_name"];
+    if($functions->selectNumRows("user_info","phone_number='".$_POST["phone_number"]."'")>1)
+    {
+        goto same_phone;
+    }
+    else
+    {
+        $new_data["phone_number"]=$_POST["phone_number"];
+    }
+    $new_data["apply_source_id"]=$_POST["apply_source_id"];
+    $new_data["country_id"]=$_POST["country_id"];
+    $new_data["visited"]=$_POST["visited"];
+    $new_data["inquiry_form_location_id"]=$_POST["inquiry_form_location_id"];
+    $new_data["consultant_id"]=$_POST["consultant_id"];
+    $new_data["qualification"]=$_POST["qualification"];
+    $new_data["comments"]=$_POST["comments"];
+    $new_data["budget"]=$_POST["budget"];
+    $functions->updateData("user_info",$new_data,"id=".$_POST["update"]);
+    goto done;
+    same_phone:
+    echo "<script>alert('Phone Number Already Exists')</script>";
+    done:
 
+}
 ?>
 <script>
     if ( window.history.replaceState ) {
@@ -53,10 +81,10 @@ class show_leads
         $this->makeSessions();
         $functions=new Functions();
         if(isset($_POST["delete"]))
-{
-    $data["enabled"]=0;
-    $functions->disableData("user_info",$data,"id=".$_POST["delete"]);
-}
+        {
+            $data["enabled"]=0;
+            $functions->disableData("user_info",$data,"id=".$_POST["delete"]);
+        }
         $user_data=$functions->get_all_data($this->min,$this->max);
         $functions->create_forms($this->page_name);
         $functions->show_leads_table();
