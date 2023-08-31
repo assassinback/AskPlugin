@@ -356,11 +356,12 @@ class Functions
     }
     function get_single_user_data($id)
     {
-        global $db, $dbPrefix, $list;
-        $query="SELECT users.email,users.enabled,users.id as main_id,users.apply_date, users.full_name,users.phone_number,users.visited,users.qualification,users.comments,users.budget,lead.priority_name,sources.source_name,countries.country_name,inquiry.inquiry_location,consultants.consultant_name FROM user_info as users INNER JOIN lead_priority as lead on users.priority_id=lead.id INNER JOIN source as sources on users.apply_source_id=sources.id INNER JOIN country as countries ON users.country_id=countries.id INNER JOIN inquiry_form_location as inquiry ON users.inquiry_form_location_id=inquiry.id INNER JOIN consultant as consultants ON users.consultant_id=consultants.id where users.id=$id AND users.enabled=1;";
-        $result=$db->query($query);
-        $row=$result->result_array();
-        return $row;
+        global $wpdb;
+        $prefix=$wpdb->prefix;
+        $query="SELECT users.email,users.enabled,users.id as main_id,users.apply_date, users.full_name,users.phone_number,users.visited,users.qualification,users.comments,users.budget,lead.priority_name,sources.source_name,countries.country_name,inquiry.inquiry_location,consultants.consultant_name FROM {$prefix}user_info as users INNER JOIN {$prefix}lead_priority as lead on users.priority_id=lead.id INNER JOIN {$prefix}source as sources on users.apply_source_id=sources.id INNER JOIN {$prefix}country as countries ON users.country_id=countries.id INNER JOIN {$prefix}inquiry_form_location as inquiry ON users.inquiry_form_location_id=inquiry.id INNER JOIN {$prefix}consultant as consultants ON users.consultant_id=consultants.id where users.id=$id AND users.enabled=1;";
+        $result=$wpdb->get_results($query);
+        // $row=$result->result_array();
+        return $result;
     }
     
     function get_single_inprocess($id)
@@ -378,6 +379,7 @@ class Functions
         INNER JOIN {$prefix}consultant as cou1 ON in_process.counselor=cou1.id 
         INNER JOIN {$prefix}fee_status as fee1 ON in_process.fee_status=fee1.id WHERE in_process.enabled=1 AND in_process.id=$id;";
         $result=$wpdb->get_results($query);
+        // echo $query;
         // $row=$result->result_array();
         return $result;
     }
@@ -420,19 +422,19 @@ class Functions
     }
     function get_single_follow_up($id)
     {
-        global $db, $dbPrefix, $list;
-        $query="SELECT follow.id,follow.user_id,follow.follow_up_number,follow.follow_up_date,follow.additional_comment,follow.staff_member,outcome.outcome_name,actions.action_name from follow_up_info as follow INNER JOIN call_outcome as outcome on follow.follow_up_outcome_id=outcome.id INNER JOIN follow_up_action as actions ON follow.follow_up_action_id=actions.id WHERE follow.user_id=$id AND follow.enabled=1;";
-        $result=$db->query($query);
-        $row=$result->result_array();
-        return $row;
+        global $wpdb;
+        $prefix=$wpdb->prefix;
+        $query="SELECT follow.id,follow.user_id,follow.follow_up_number,follow.follow_up_date,follow.additional_comment,follow.staff_member,outcome.outcome_name,actions.action_name from {$prefix}follow_up_inprocess as follow INNER JOIN {$prefix}call_outcome as outcome on follow.follow_up_outcome=outcome.id INNER JOIN {$prefix}follow_up_action as actions ON follow.follow_up_action=actions.id WHERE follow.user_id=$id AND follow.enabled=1;";
+        $result=$wpdb->get_results($query);
+        return $result;
     }
     function get_single_follow_up_inprocess($id)
     {
-        global $db, $dbPrefix, $list;
-        $query="SELECT * from follow_up_inprocess WHERE user_id=$id AND enabled=1;";
-        $result=$db->query($query);
-        $row=$result->result_array();
-        return $row;
+        global $wpdb;
+        $prefix=$wpdb->prefix;
+        $query="SELECT follow.id,follow.user_id,follow.follow_up_number,follow.follow_up_date,follow.additional_comment,follow.staff_member,outcome.outcome_name,actions.action_name from {$prefix}follow_up_info as follow INNER JOIN {$prefix}call_outcome as outcome on follow.follow_up_outcome_id=outcome.id INNER JOIN {$prefix}follow_up_action as actions ON follow.follow_up_action_id=actions.id WHERE follow.user_id=$id AND follow.enabled=1;";
+        $result=$wpdb->get_results($query);
+        return $result;
     }
     function get_single_follow_up_for_one($id)
     {
@@ -910,7 +912,7 @@ class Functions
         foreach($user_data as $rows)
         {
             echo "<tr>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='".admin_url('admin.php?page=Follow_Up_InProcess')."'><input type='hidden' name='follow' value='".$rows->id."'><input type='submit' name='follow_btn' value='Follow Up' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='".admin_url('admin.php?page=Follow_Up_InProcess')."'><input type='hidden' name='follow_inprocess' value='".$rows->id."'><input type='submit' name='follow_btn' value='Follow Up' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
             echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST'><input type='hidden' name='update' value='".$rows->id."'><input type='submit' name='update_btn' value='Update' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></td>";
             echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->id."</td>";
             // if($this->checkPrivilage($_SESSION["user_type"],"admin") || $this->checkPrivilage($_SESSION["user_type"],"accounts") || $this->checkPrivilage($_SESSION["user_type"],"case_admin"))
@@ -1085,8 +1087,7 @@ class Functions
             echo "<thead><tr>";
         echo "<th class='text-center text-uppercase text-xs font-weight-bolder opacity-10'>Update</th>";
         echo "<th class='text-center text-uppercase text-xs font-weight-bolder opacity-10'>S.No</th>";
-        
-        echo "<th class='text-center text-uppercase text-xs font-weight-bolder opacity-10'>Date</th>";
+        echo "<th class='text-center text-uppercase text-xs font-weight-bolder opacity-10'>Visa Granted</th>";
         echo "<th class='text-center text-uppercase text-xs font-weight-bolder opacity-10'>Name</th>";
         echo "<th class='text-center text-uppercase text-xs font-weight-bolder opacity-10'>Phone</th>";
         echo "<th class='text-center text-uppercase text-xs font-weight-bolder opacity-10'>Country</th>";
@@ -1272,6 +1273,349 @@ class Functions
                 </div>
     
     <?php
+    }
+    function create_follow_up_table_leads()
+    {
+        $user_data=$this->get_single_user_data(get_transient( 'follow' )); 
+        ?>
+         <div class="container-fluid py-4">
+      <div class="row">
+          <div class="card mb-4">
+            <div class="card-header pb-0">
+              <h1>Leads Follow Up</h1>
+            </div>
+    <label>S.No: </label><?php echo get_transient( 'follow' ); ?><br>
+    <label>Full Name: </label><?php echo $user_data[0]->full_name; ?><br>
+    <form method='POST' action='add_followup_leads.php'>
+        <input type='hidden' name='update_btn' value='<?php echo get_transient( 'follow' ); ?>'>
+        <label>Add Follow Up:</label><input type='submit' name='follow_btn' value='Follow Up' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'>
+    </form>
+            <div class='card-body px-0 pt-0 pb-2'>
+<div class='table-responsive p-0'><table class='table align-items-center mb-0'>
+<thead><tr>
+            <th class='text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7'>Follow Up Number</th>
+            <th class='text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7'>Follow Up Date</th>
+            <th class='text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7'>Follow Up Outcome</th>
+            <th class='text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7'>Additional Comments</th>
+            <th class='text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7'>Follow Up Action</th>
+            <th class='text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7'>Staff Member</th>
+            <?php  
+            // if(checkPrivilage($_SESSION["user_type"],"admin") || checkPrivilage($_SESSION["user_type"],"counsellor"))
+            // { 
+            ?>
+                <th class='text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7'>Update</th>
+                <th class='text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7'>Delete</th>
+            <?php   
+            // } 
+            ?>
+        </tr>
+        <tbody>
+        <?php
+    }
+    function create_follow_up_data_leads()
+    {
+        $outcome=$this->selectData("call_outcome","enabled=1");
+        $action=$this->selectData("follow_up_action","enabled=1");
+        $user_follow_up_data=$this->get_single_follow_up_inprocess(get_transient( 'follow' ));
+        foreach($user_follow_up_data as $rows)
+            {
+
+                ?>
+                <tr>
+                <form method='POST'>
+                    <td class='text-center text-secondary text-xs font-weight-bold'><input type='text' name='follow_up_number' value='<?php echo $rows->follow_up_number  ?>'></td>
+                    <td class='text-center text-secondary text-xs font-weight-bold'><input type='text' name='follow_up_date' value='<?php echo $rows->follow_up_date  ?>'></td>
+                    <td class='text-center text-secondary text-xs font-weight-bold'><select name="follow_up_outcome_id" class="form-control form-control-lg">
+
+                    <?php
+                        foreach($outcome as $rows1)
+                        {
+                            if($rows->outcome_name==$rows1->outcome_name)
+                            {
+                                ?>
+                                <option selected="selected" value="<?php echo $rows1->id  ?>"><?php echo $rows1->outcome_name  ?></option>
+                                <?php
+                            }
+                            else
+                            {
+                            ?>
+                            
+                            <option value="<?php echo $rows1->id  ?>"><?php echo $rows1->outcome_name  ?></option>
+                            
+                            <?php
+                            }
+                        }
+                    ?>
+                    </select></td>
+                    <td class='text-center text-secondary text-xs font-weight-bold'><input type='text' name='additional_comment' value='<?php echo $rows->additional_comment  ?>'></td>
+                    <td class='text-center text-secondary text-xs font-weight-bold'><select name="follow_up_action_id" class="form-control form-control-lg">
+
+                    <?php
+                        foreach($action as $rows2)
+                        {
+                            if($rows->action_name==$rows2->action_name)
+                            {
+                                ?>
+                                <option selected="selected" value="<?php echo $rows2->id  ?>"><?php echo $rows2->action_name  ?></option>
+                                <?php
+                            }
+                            else
+                            {
+                            ?>
+
+                            <option value="<?php echo $rows2->id  ?>"><?php echo $rows2->action_name  ?></option>
+                            
+                            <?php
+                            }
+                        }
+                    ?>
+                    </select></td>
+                    <td class='text-center text-secondary text-xs font-weight-bold'><input type='text' name='staff_member' value='<?php echo $rows->staff_member  ?>'></td>
+                    <?php
+                    // if(checkPrivilage($_SESSION["user_type"],"admin") || checkPrivilage($_SESSION["user_type"],"counsellor"))
+                    // {
+                        echo "<td class='text-center text-secondary text-xs font-weight-bold'><input type='hidden' name='user_id' value='".$rows->user_id."'><input type='hidden' name='update' value='".$rows->id."'><input type='submit' name='update_btn' value='Update' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
+                        echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST'><input type='hidden' name='user_id' value='".$rows->user_id."'><input type='hidden' name='delete' value='".$rows->id."'><input type='submit' name='delete_btn' value='Delete' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
+                    // }
+                    ?>
+                </tr>
+
+                <?php
+            }
+        ?>
+    </tbody></table></div></div></div></div></div></div>
+    <?php
+    }
+    function create_follow_up_table_in_process()
+    {
+        $user_data=$this->get_single_inprocess(get_transient( 'follow_inprocess' )); 
+        ?>
+         <div class="container-fluid py-4">
+      <div class="row">
+          <div class="card mb-4">
+            <div class="card-header pb-0">
+              <h1>Leads Follow Up</h1>
+            </div>
+    <label>S.No: </label><?php echo get_transient( 'follow_inprocess' ); ?><br>
+    <?php
+    
+    ?>
+    <label>Full Name: </label><?php echo $user_data[0]->name; ?><br>
+    <form method='POST'>
+        <input type='hidden' name='update_btn' value='<?php echo get_transient( 'follow_inprocess' ); ?>'>
+        <label>Add Follow Up:</label><input type='submit' name='follow_btn' value='Follow Up' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'>
+    </form>
+            <div class='card-body px-0 pt-0 pb-2'>
+<div class='table-responsive p-0'><table class='table align-items-center mb-0'>
+<thead><tr>
+            <th class='text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7'>Follow Up Number</th>
+            <th class='text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7'>Follow Up Date</th>
+            <th class='text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7'>Follow Up Outcome</th>
+            <th class='text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7'>Additional Comments</th>
+            <th class='text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7'>Follow Up Action</th>
+            <th class='text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7'>Staff Member</th>
+            <?php  
+            // if(checkPrivilage($_SESSION["user_type"],"admin") || checkPrivilage($_SESSION["user_type"],"counsellor"))
+            // { 
+            ?>
+                <th class='text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7'>Update</th>
+                <th class='text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7'>Delete</th>
+            <?php   
+            // } 
+            ?>
+        </tr>
+        <tbody>
+        <?php
+    }
+    function create_follow_up_data_in_process()
+    {
+        $outcome=$this->selectData("call_outcome","enabled=1");
+        $action=$this->selectData("follow_up_action","enabled=1");
+        $user_follow_up_data=$this->get_single_follow_up(get_transient( 'follow_inprocess' ));
+        foreach($user_follow_up_data as $rows)
+            {
+
+                ?>
+                <tr>
+                <form method='POST'>
+                    <td class='text-center text-secondary text-xs font-weight-bold'><input type='text' name='follow_up_number' value='<?php echo $rows->follow_up_number  ?>'></td>
+                    <td class='text-center text-secondary text-xs font-weight-bold'><input type='text' name='follow_up_date' value='<?php echo $rows->follow_up_date  ?>'></td>
+                    <td class='text-center text-secondary text-xs font-weight-bold'><select name="follow_up_outcome_id" class="form-control form-control-lg">
+
+                    <?php
+                        foreach($outcome as $rows1)
+                        {
+                            if($rows->outcome_name==$rows1->outcome_name)
+                            {
+                                ?>
+                                <option selected="selected" value="<?php echo $rows1->id  ?>"><?php echo $rows1->outcome_name  ?></option>
+                                <?php
+                            }
+                            else
+                            {
+                            ?>
+                            
+                            <option value="<?php echo $rows1->id  ?>"><?php echo $rows1->outcome_name  ?></option>
+                            
+                            <?php
+                            }
+                        }
+                    ?>
+                    </select></td>
+                    <td class='text-center text-secondary text-xs font-weight-bold'><input type='text' name='additional_comment' value='<?php echo $rows->additional_comment  ?>'></td>
+                    <td class='text-center text-secondary text-xs font-weight-bold'><select name="follow_up_action_id" class="form-control form-control-lg">
+
+                    <?php
+                        foreach($action as $rows2)
+                        {
+                            if($rows->action_name==$rows2->action_name)
+                            {
+                                ?>
+                                <option selected="selected" value="<?php echo $rows2->id  ?>"><?php echo $rows2->action_name  ?></option>
+                                <?php
+                            }
+                            else
+                            {
+                            ?>
+
+                            <option value="<?php echo $rows2->id  ?>"><?php echo $rows2->action_name  ?></option>
+                            
+                            <?php
+                            }
+                        }
+                    ?>
+                    </select></td>
+                    <td class='text-center text-secondary text-xs font-weight-bold'><input type='text' name='staff_member' value='<?php echo $rows->staff_member  ?>'></td>
+                    <?php
+                    // if(checkPrivilage($_SESSION["user_type"],"admin") || checkPrivilage($_SESSION["user_type"],"counsellor"))
+                    // {
+                        echo "<td class='text-center text-secondary text-xs font-weight-bold'><input type='hidden' name='user_id' value='".$rows->user_id."'><input type='hidden' name='update' value='".$rows->id."'><input type='submit' name='update_btn' value='Update' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
+                        echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST'><input type='hidden' name='user_id' value='".$rows->user_id."'><input type='hidden' name='delete' value='".$rows->id."'><input type='submit' name='delete_btn' value='Delete' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
+                    // }
+                    ?>
+                </tr>
+
+                <?php
+            }
+        ?>
+    </tbody></table></div></div></div></div></div></div>
+    <?php
+    }
+    function add_follow_up_leads()
+    {
+        $outcome=$this->selectData("call_outcome","enabled=1");
+        $action=$this->selectData("follow_up_action","enabled=1");
+        ?>
+        <form method="POST" style="margin-top:220px !important;">
+<?php
+
+
+?>
+        <div class="container-fluid py-4">
+            <div class="row">
+                <div class="col-12">
+            <!-- <label>S.No:</label><?php //echo $_POST["update_btn"];?><br> -->
+            <input type="hidden" name="user_id" value="<?php echo get_transient( 'follow' );    ?>">
+            <label>Follow Up Number:</label><br><input class="form-control form-control-lg" type="text" name="follow_up_number"><br>
+            <label>Follow Up Date:</label><br><input class="form-control form-control-lg" type="text" name="follow_up_date"><br>
+            <label>Follow Up Outcome:</label><br>
+            <select name="follow_up_outcome_id" class="form-control form-control-lg">
+                <?php
+                    foreach($outcome as $rows1)
+                    {
+                        ?>
+                        <option value="<?php echo $rows1->id  ?>"><?php echo $rows1->outcome_name  ?></option>
+                        <?php
+                    }
+                ?>
+            </select><br>
+            
+            
+            <label>Additional Comments:</label><br><input class="form-control form-control-lg" type="text" name="additional_comment"><br>
+            <label>Follow Up Action:</label><br>
+            <select name="follow_up_action_id" class="form-control form-control-lg">
+                <?php
+                    foreach($action as $rows2)
+                    {
+                        
+                        ?>
+
+                        <option value="<?php echo $rows2->id  ?>"><?php echo $rows2->action_name  ?></option>
+                        
+                        <?php
+                        
+                    }
+                ?>
+            </select><br>
+            <label>Staff Member:</label><br><input class="form-control form-control-lg" type="text" name="staff_member"><br>
+            <br>
+            <input class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0" type="submit" value="Insert" name="insert_done">
+        <?php
+
+
+        ?>
+        </div></div></div>
+        </form>
+
+        <?php
+    }
+    function add_follow_up_in_process()
+    {
+        $outcome=$this->selectData("call_outcome","enabled=1");
+        $action=$this->selectData("follow_up_action","enabled=1");
+        ?>
+        <form method="POST" style="margin-top:220px !important;">
+<?php
+
+
+?>
+        <div class="container-fluid py-4">
+            <div class="row">
+                <div class="col-12">
+            <!-- <label>S.No:</label><?php //echo $_POST["update_btn"];?><br> -->
+            <input type="hidden" name="user_id" value="<?php echo get_transient( 'follow_inprocess' );    ?>">
+            <label>Follow Up Number:</label><br><input class="form-control form-control-lg" type="text" name="follow_up_number"><br>
+            <label>Follow Up Date:</label><br><input class="form-control form-control-lg" type="text" name="follow_up_date"><br>
+            <label>Follow Up Outcome:</label><br>
+            <select name="follow_up_outcome" class="form-control form-control-lg">
+                <?php
+                    foreach($outcome as $rows1)
+                    {
+                        ?>
+                        <option value="<?php echo $rows1->id  ?>"><?php echo $rows1->outcome_name  ?></option>
+                        <?php
+                    }
+                ?>
+            </select><br>
+            
+            
+            <label>Additional Comments:</label><br><input class="form-control form-control-lg" type="text" name="additional_comment"><br>
+            <label>Follow Up Action:</label><br>
+            <select name="follow_up_action" class="form-control form-control-lg">
+                <?php
+                    foreach($action as $rows2)
+                    {
+                        
+                        ?>
+
+                        <option value="<?php echo $rows2->id  ?>"><?php echo $rows2->action_name  ?></option>
+                        
+                        <?php
+                        
+                    }
+                ?>
+            </select><br>
+            <label>Staff Member:</label><br><input class="form-control form-control-lg" type="text" name="staff_member"><br>
+            <br>
+            <input class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0" type="submit" value="Insert" name="insert_done">
+        <?php
+
+
+        ?>
+        </div></div></div>
+        </form>
+
+        <?php
     }
 }
 
