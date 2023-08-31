@@ -23,6 +23,38 @@ if(isset($_POST["update_btn"]))
     $new_data["comments"]=$_POST["comments"];
     $functions->updateData("completed",$new_data,"id=".$_POST["update"]);
 }
+if(isset($_POST["send_back"]))
+{
+    $data12["enabled"]=0;
+    $user_data=$functions->selectData("completed","id=".$_POST["send_back"]);
+    if($functions->selectCount("in_process","id=".$_POST["send_back"])>0)
+    {
+        $data["enabled"]=1;
+        $functions->disableData("in_process",$data,"id=".$_POST["send_back"]);
+    }
+    else
+    {
+        foreach($user_data as $rows)
+        {
+            $data1["id"]=$rows->id;
+            $data1["case_assign_date"]=date("j/n/Y");
+            $data1["name"]=$rows->full_name;
+            $data1["phone"]=$rows->phone_number;
+            $data1["email"]=$rows->email;
+            $data1["destination_1"]=1;
+            $data1["counselor"]=1;
+            $data1["fee_status"]=1;
+            $data1["destination_2"]=1;
+            $data1["case_status_1"]=1;
+            $data1["case_status_2"]=1;
+            global $current_user;
+            $data1["insert_admin"]=$current_user->user_login;
+            $functions->insertData("in_process",$data1);
+        }
+    }
+    
+    $functions->disableData("completed",$data12,"id=".$_POST["send_back"]);
+}
 ?>
 <?php
 

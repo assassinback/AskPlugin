@@ -33,6 +33,40 @@ if(isset($_POST["update_btn"]))
     done:
 
 }
+if(isset($_POST["inprocess"]))
+{
+    $data12["enabled"]=0;
+    $user_data=$functions->selectData("user_info","id=".$_POST["inprocess"]);
+    if($functions->selectCount("in_process","id=".$_POST["inprocess"])>0)
+    {
+        $data["enabled"]=1;
+        $functions->disableData("in_process",$data,"id=".$_POST["inprocess"]);
+    }
+    else
+    {
+        foreach($user_data as $rows)
+        {
+            $data1["id"]=$rows->id;
+            $data1["case_assign_date"]=date("j/n/Y");
+            $data1["name"]=$rows->full_name;
+            $data1["phone"]=$rows->phone_number;
+            $data1["email"]=$rows->email;
+            $data1["destination_1"]=1;
+            $data1["counselor"]=1;
+            $data1["fee_status"]=1;
+            $data1["destination_2"]=1;
+            $data1["case_status_1"]=1;
+            $data1["case_status_2"]=1;
+            global $current_user;
+            $data1["insert_admin"]=$current_user->user_login;
+            $functions->insertData("in_process",$data1);
+        }
+    }
+    
+    $functions->disableData("user_info",$data12,"id=".$_POST["inprocess"]);
+    // header("Location:show_data.php");
+}
+
 ?>
 <script>
     if ( window.history.replaceState ) {

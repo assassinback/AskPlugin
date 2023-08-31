@@ -34,6 +34,64 @@ if(isset($_POST["update_btn"]))
     $new_data["final_comments"]=$_POST["final_comments"];
     $functions->updateData("in_process",$new_data,"id=".$_POST["update"]);
 }
+if(isset($_POST["send_back"]))
+{
+    $data2["enabled"]=0;
+    if($functions->selectCount("user_info","id=".$_POST["send_back"])>0)
+    {
+        
+        $data["enabled"]=1;
+        $functions->disableData("user_info",$data,"id=".$_POST["send_back"]);
+        
+    }
+    else
+    {
+        $user_data=$functions->selectData("in_process","id=".$_POST["send_back"]);
+        foreach($user_data as $rows)
+        {
+            $data1["id"]=$rows->id;
+            $data1["apply_date"]=date("j/n/Y");
+            $data1["full_name"]=$rows->name;
+            $data1["phone_number"]=$rows->phone;
+            $data1["email"]=$rows->email;
+            $data1["priority_id"]=1;
+            $data1["apply_source_id"]=1;
+            $data1["country_id"]=1;
+            $data1["inquiry_form_location_id"]=1;
+            $data1["consultant_id"]=1;
+            global $current_user;
+            $data1["insert_admin"]=$current_user->user_login;
+            $functions->insertData("user_info",$data1);
+        }
+    }
+    $functions->disableData("in_process",$data2,"id=".$_POST["send_back"]);
+    
+}
+if(isset($_POST["completed"]))
+{
+    $data12["enabled"]=0;
+    $user_data=$functions->selectData("in_process","id=".$_POST["completed"]);
+    if($functions->selectCount("completed","id=".$_POST["completed"])>0)
+    {
+        $data["enabled"]=1;
+        $functions->disableData("completed",$data,"id=".$_POST["completed"]);
+    }
+    else
+    {
+        foreach($user_data as $rows)
+        {
+            $data1["id"]=$rows->id;
+            $data1["date"]=date("j/n/Y");
+            $data1["full_name"]=$rows->name;
+            $data1["phone"]=$rows->phone;
+            global $current_user;
+            $data1["insert_admin"]=$current_user->user_login;
+            $functions->insertData("completed",$data1);
+        }
+    }
+    
+    $functions->disableData("in_process",$data12,"id=".$_POST["completed"]);
+}
 ?>
 
 <?php

@@ -515,7 +515,8 @@ class Functions
         return $count;
     }
     function selectCount($table="",$where="", $data=array()) {
-        global $db, $dbPrefix, $list;
+        global $wpdb,$dbPrefix,$list;
+        $prefix=$wpdb->prefix;
         
         if ($table == "") {
             return false;
@@ -529,25 +530,24 @@ class Functions
             }
             $columns = implode(', ', $columns);
         }
-        $sql = 'SELECT COUNT(*) as amount FROM ' . $dbPrefix . $table;
+        $sql = 'SELECT COUNT(*) as amount FROM ' . $prefix . $table;
         
         if ($where != "") {
             $sql .= ' WHERE ' . $where; 
         }
         if($data==null)
         {
-            $update = $db->query($sql);
+            $result=$wpdb->get_results($sql);
         }
         else
         {
-            $update = $db->query($sql, $values);
+            $result=$wpdb->get_results($sql);
         }
-        echo $sql;
         //echo $db->last_query();
-        $row=$update->result_array();
+        $row=$result;
         foreach($row as $rows)
         {
-            return $rows["amount"];
+            return $rows->amount;
         }
         // return $row;
     }
@@ -842,7 +842,7 @@ class Functions
             echo "<td class='text-center text-secondary text-xs font-weight-bold'><input type='text' name='comments' value='".$rows->comments."'</td>";
             echo "<td class='text-center text-secondary text-xs font-weight-bold'><input type='text' name='budget' value='".$rows->budget."'</td>";
             echo "</form><td class='text-center text-secondary text-xs font-weight-bold'>".$rows->insert_admin."</td>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='send_to_inprocess.php'><input type='hidden' name='inprocess' value='".$rows->main_id."'><input type='submit' name='inprocess_btn' value='Send to Inprocess' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST'><input type='hidden' name='inprocess' value='".$rows->main_id."'><input type='submit' name='inprocess_btn' value='Send to Inprocess' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
             // if($this->checkPrivilage($_SESSION["user_type"],"admin") || $this->checkPrivilage($_SESSION["user_type"],"counsellor"))
             // {
             echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST'><input type='hidden' name='delete' value='".$rows->main_id."'><input type='submit' name='delete_btn' value='Delete' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
@@ -1064,13 +1064,13 @@ class Functions
             // if($this->checkPrivilage($_SESSION["user_type"],"admin") || $this->checkPrivilage($_SESSION["user_type"],"accounts") || $this->checkPrivilage($_SESSION["user_type"],"case_admin"))
             // {
                 echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST'><input type='hidden' name='delete' value='".$rows->id."'><input type='submit' name='delete_btn' value='Delete' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
-                echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='send_back_to_leads.php'><input type='hidden' name='send_back' value='".$rows->id."'><input type='submit' name='send_back_btn' value='Send Back to Leads' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
+                echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST'><input type='hidden' name='send_back' value='".$rows->id."'><input type='submit' name='send_back_btn' value='Send Back to Leads' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
             // }
             // if($this->checkPrivilage($_SESSION["user_type"],"admin") || $this->checkPrivilage($_SESSION["user_type"],"counsellor"))
             // {
                 // echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='send_back_to_leads.php'><input type='hidden' name='send_back' value='".$rows->id."'><input type='submit' name='send_back_btn' value='Send Back to Leads' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
             // }
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='send_to_completed.php'><input type='hidden' name='completed' value='".$rows->id."'><input type='submit' name='completed_btn' value='Send to Completed' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST'><input type='hidden' name='completed' value='".$rows->id."'><input type='submit' name='completed_btn' value='Send to Completed' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
             echo "</tr>";
         }
         
@@ -1127,7 +1127,7 @@ class Functions
         echo "<td class='text-center text-secondary text-xs font-weight-bold'><input type='text' name='insert_admin' value='".$rows->insert_admin."'></td></form>";
         
         echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST'><input type='hidden' name='delete' value='".$rows->id."'><input type='submit' name='delete_btn' value='Delete' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";   
-        echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='send_back_to_inprocess.php'><input type='hidden' name='send_back' value='".$rows->id."'><input type='submit' name='send_back_btn' value='Send Back To Inprocess' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";   
+        echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST'><input type='hidden' name='send_back' value='".$rows->id."'><input type='submit' name='send_back_btn' value='Send Back To Inprocess' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";   
         echo "</tr>";
     }
     echo "</tbody></table></div></div></div></div></div></div>";
