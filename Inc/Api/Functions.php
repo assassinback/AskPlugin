@@ -726,7 +726,7 @@ class Functions
             
         
             echo "<tr>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='follow_up.php'><input type='hidden' name='follow' value='".$rows->main_id."'><input type='submit' name='follow_btn' value='Follow Up' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='".admin_url('admin.php?page=Follow_Up_Leads')."'><input type='hidden' name='follow' value='".$rows->main_id."'><input type='submit' name='follow_btn' value='Follow Up' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
             echo "<form method='POST'><td class='text-center text-secondary text-xs font-weight-bold'>".$rows->main_id."</td>";
             // if($this->checkPrivilage($_SESSION["user_type"],"admin") || $this->checkPrivilage($_SESSION["user_type"],"counsellor"))
             // {
@@ -910,7 +910,7 @@ class Functions
         foreach($user_data as $rows)
         {
             echo "<tr>";
-            echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='follow_up_inprocess.php'><input type='hidden' name='follow' value='".$rows->id."'><input type='submit' name='follow_btn' value='Follow Up' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
+            echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST' action='".admin_url('admin.php?page=Follow_Up_InProcess')."'><input type='hidden' name='follow' value='".$rows->id."'><input type='submit' name='follow_btn' value='Follow Up' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></form></td>";
             echo "<td class='text-center text-secondary text-xs font-weight-bold'><form method='POST'><input type='hidden' name='update' value='".$rows->id."'><input type='submit' name='update_btn' value='Update' style='background-color:transparent;border:none;' class='text-secondary font-weight-bold text-xs'></td>";
             echo "<td class='text-center text-secondary text-xs font-weight-bold'>".$rows->id."</td>";
             // if($this->checkPrivilage($_SESSION["user_type"],"admin") || $this->checkPrivilage($_SESSION["user_type"],"accounts") || $this->checkPrivilage($_SESSION["user_type"],"case_admin"))

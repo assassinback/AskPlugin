@@ -146,6 +146,26 @@ class Admin
             'callback'=>array($this->callbacks,'show_admins'),
             'position'=>9
             ),
+            array
+            (
+            'parent_slug'=>'Ask_Portal',
+            'page_title'=>'Follow Up Leads',
+            'menu_title'=>'Follow Up Leads',
+            'capability'=>'manage_options',
+            'menu_slug'=>'Follow_Up_Leads',
+            'callback'=>array($this->callbacks,'follow_up_leads'),
+            'position'=>10
+            ),
+            array
+            (
+            'parent_slug'=>'Ask_Portal',
+            'page_title'=>'Follow Up InProcess',
+            'menu_title'=>'Follow Up InProcess',
+            'capability'=>'manage_options',
+            'menu_slug'=>'Follow_Up_InProcess',
+            'callback'=>array($this->callbacks,'follow_up_inprocess'),
+            'position'=>11
+            ),
             
         );
     }

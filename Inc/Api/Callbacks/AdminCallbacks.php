@@ -54,7 +54,14 @@ class AdminCallbacks extends BaseController
     {
         require_once("$this->plugin_path/templates/show_admins.php");
     }
-    
+    public function follow_up_leads()
+    {
+        require_once("$this->plugin_path/templates/follow_up_leads.php");
+    }
+    public function follow_up_inprocess()
+    {
+        require_once("$this->plugin_path/templates/follow_up_inprocess.php");
+    }
     public function askOptionsGroup($input)
     {
         return $input;
@@ -63,6 +70,7 @@ class AdminCallbacks extends BaseController
     {
         echo "Check this beutiful section";
     }
+    
     public function askTextExample()
     {
         $value=esc_attr(get_option('show_leads'));
