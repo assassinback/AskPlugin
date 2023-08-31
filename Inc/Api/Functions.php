@@ -173,8 +173,22 @@ class Functions
         }
         return $max;
     }
-    
-    
+    function get_single_user_data_new($id)
+    {
+        global $wpdb;
+        $prefix=$wpdb->prefix;
+        $query="SELECT users.insert_admin,users.email,users.enabled,users.id as main_id,users.apply_date, users.full_name,users.phone_number,users.visited,users.qualification,users.comments,users.budget,lead.priority_name,sources.source_name,countries.country_name,inquiry.inquiry_location,consultants.consultant_name FROM {$prefix}user_info as users INNER JOIN {$prefix}lead_priority as lead on users.priority_id=lead.id INNER JOIN {$prefix}source as sources on users.apply_source_id=sources.id INNER JOIN {$prefix}country as countries ON users.country_id=countries.id INNER JOIN {$prefix}inquiry_form_location as inquiry ON users.inquiry_form_location_id=inquiry.id INNER JOIN {$prefix}consultant as consultants ON users.consultant_id=consultants.id where (users.id LIKE '%$id%' OR users.full_name LIKE '%$id%' OR users.email LIKE '%$id%' OR users.apply_date LIKE '%$id%' OR users.phone_number LIKE '%$id%') AND users.enabled=1;";
+        $update = $wpdb->get_results($query);
+        return $update;
+    }
+    function get_all_data_follow_new($date)
+    {
+        global $wpdb;
+        $prefix=$wpdb->prefix;
+        $query="SELECT users.insert_admin,users.id as main_id,users.apply_date, users.full_name,users.phone_number,users.email,users.visited,users.qualification,users.comments,users.budget,lead.priority_name,sources.source_name,countries.country_name,inquiry.inquiry_location,consultants.consultant_name, follow.id,follow.user_id,follow.follow_up_number,follow.follow_up_date,follow.additional_comment,follow.staff_member,actions.action_name,outcome.outcome_name FROM {$prefix}user_info as users INNER JOIN {$prefix}lead_priority as lead on users.priority_id=lead.id INNER JOIN {$prefix}source as sources on users.apply_source_id=sources.id INNER JOIN {$prefix}country as countries ON users.country_id=countries.id INNER JOIN {$prefix}inquiry_form_location as inquiry ON users.inquiry_form_location_id=inquiry.id INNER JOIN {$prefix}consultant as consultants ON users.consultant_id=consultants.id LEFT JOIN {$prefix}follow_up_info as follow ON users.id=follow.user_id INNER JOIN {$prefix}call_outcome as outcome on follow.follow_up_outcome_id=outcome.id INNER JOIN {$prefix}follow_up_action as actions ON follow.follow_up_action_id=actions.id WHERE follow.follow_up_date ='$date'";
+        $update = $wpdb->get_results($query);
+        return $update;
+    }
     function deleteData($table="", $data=array(), $where="") {
         global $db, $dbPrefix, $list;
         
@@ -295,55 +309,24 @@ class Functions
         // fix_arrays($row);
         return $row;
     }
-    function get_all_data_follow_new($date)
-    {
-        global $db, $dbPrefix, $list;
-        $query="SELECT users.insert_admin,users.id as main_id,users.apply_date, users.full_name,users.phone_number,users.email,users.visited,users.qualification,users.comments,users.budget,lead.priority_name,sources.source_name,countries.country_name,inquiry.inquiry_location,consultants.consultant_name, follow.id,follow.user_id,follow.follow_up_number,follow.follow_up_date,follow.additional_comment,follow.staff_member,actions.action_name,outcome.outcome_name FROM user_info as users INNER JOIN lead_priority as lead on users.priority_id=lead.id INNER JOIN source as sources on users.apply_source_id=sources.id INNER JOIN country as countries ON users.country_id=countries.id INNER JOIN inquiry_form_location as inquiry ON users.inquiry_form_location_id=inquiry.id INNER JOIN consultant as consultants ON users.consultant_id=consultants.id LEFT JOIN follow_up_info as follow ON users.id=follow.user_id INNER JOIN call_outcome as outcome on follow.follow_up_outcome_id=outcome.id INNER JOIN follow_up_action as actions ON follow.follow_up_action_id=actions.id WHERE follow.follow_up_date ='$date'";
-        // echo $query;
-        $result=$db->query($query);
-        $row=$result->result_array();
-        // fix_arrays($row);
-        return $row;
-    }
-    function get_follow_inprocess($type,$date)
-    {
-        global $db, $dbPrefix, $list;
-        $query="SELECT in_process.ask_email,in_process.id,in_process.case_assign_date,in_process.name,in_process.phone,in_process.email
-        ,des1.destination_name as dest_1,cou1.consultant_name,in_process.comments,fee1.status_name,in_process.admin,in_process.university_1,in_process.outcome_destination_1,case_status1.status_name as case_status_1,des2.destination_name as dest_2,
-        in_process.case_handler_2,in_process.intake,in_process.university_2,in_process.outcome_destination_2,case_status2.status_name as case_status_2,in_process.course,in_process.case_handler_2,in_process.missing_docs,in_process.final_comments 
-        FROM in_process as in_process 
-        INNER JOIN destination as des1 ON in_process.destination_1=des1.id
-        INNER JOIN destination as des2 ON in_process.destination_2=des2.id
-        INNER JOIN consultant as cou1 ON in_process.counselor=cou1.id 
-        INNER JOIN case_status as case_status1 ON in_process.case_status_1=case_status1.id 
-        INNER JOIN case_status as case_status2 ON in_process.case_status_2=case_status2.id 
-        INNER JOIN fee_status as fee1 ON in_process.fee_status=fee1.id
-        LEFT JOIN follow_up_inprocess as follow ON in_process.id=follow.user_id
-        WHERE in_process.enabled=1 AND follow.follow_up_date LIKE '%$type%' AND follow.follow_up_date LIKE '%$date%';";
-        // echo $query;
-        $result=$db->query($query);
-        $row=$result->result_array();
-        return $row;
-    }
     function get_follow_inprocess_new($combined)
     {
-        global $db, $dbPrefix, $list;
+        global $wpdb;
+        $prefix=$wpdb->prefix;
         $query="SELECT in_process.insert_admin,in_process.ask_email,in_process.id,in_process.case_assign_date,in_process.name,in_process.phone,in_process.email
         ,des1.destination_name as dest_1,cou1.consultant_name,in_process.comments,fee1.status_name,in_process.admin,in_process.university_1,in_process.outcome_destination_1,case_status1.status_name as case_status_1,des2.destination_name as dest_2,
         in_process.case_handler_2,in_process.intake,in_process.university_2,in_process.outcome_destination_2,case_status2.status_name as case_status_2,in_process.course,in_process.case_handler_2,in_process.missing_docs,in_process.final_comments 
-        FROM in_process as in_process 
-        INNER JOIN destination as des1 ON in_process.destination_1=des1.id
-        INNER JOIN destination as des2 ON in_process.destination_2=des2.id
-        INNER JOIN consultant as cou1 ON in_process.counselor=cou1.id 
-        INNER JOIN case_status as case_status1 ON in_process.case_status_1=case_status1.id 
-        INNER JOIN case_status as case_status2 ON in_process.case_status_2=case_status2.id 
-        INNER JOIN fee_status as fee1 ON in_process.fee_status=fee1.id
-        LEFT JOIN follow_up_inprocess as follow ON in_process.id=follow.user_id
+        FROM {$prefix}in_process as in_process 
+        INNER JOIN {$prefix}destination as des1 ON in_process.destination_1=des1.id
+        INNER JOIN {$prefix}destination as des2 ON in_process.destination_2=des2.id
+        INNER JOIN {$prefix}consultant as cou1 ON in_process.counselor=cou1.id 
+        INNER JOIN {$prefix}case_status as case_status1 ON in_process.case_status_1=case_status1.id 
+        INNER JOIN {$prefix}case_status as case_status2 ON in_process.case_status_2=case_status2.id 
+        INNER JOIN {$prefix}fee_status as fee1 ON in_process.fee_status=fee1.id
+        LEFT JOIN {$prefix}follow_up_inprocess as follow ON in_process.id=follow.user_id
         WHERE in_process.enabled=1 AND follow.follow_up_date = '$combined';";
-        // echo $query;
-        $result=$db->query($query);
-        $row=$result->result_array();
-        return $row;
+        $update = $wpdb->get_results($query);
+        return $update;
     }
     // function get_single_user_data($id)
     // {
@@ -379,57 +362,53 @@ class Functions
         $row=$result->result_array();
         return $row;
     }
-    function get_single_user_data_new($id)
-    {
-        global $db, $dbPrefix, $list;
-        $query="SELECT users.insert_admin,users.email,users.enabled,users.id as main_id,users.apply_date, users.full_name,users.phone_number,users.visited,users.qualification,users.comments,users.budget,lead.priority_name,sources.source_name,countries.country_name,inquiry.inquiry_location,consultants.consultant_name FROM user_info as users INNER JOIN lead_priority as lead on users.priority_id=lead.id INNER JOIN source as sources on users.apply_source_id=sources.id INNER JOIN country as countries ON users.country_id=countries.id INNER JOIN inquiry_form_location as inquiry ON users.inquiry_form_location_id=inquiry.id INNER JOIN consultant as consultants ON users.consultant_id=consultants.id where (users.id LIKE '%$id%' OR users.full_name LIKE '%$id%' OR users.email LIKE '%$id%' OR users.apply_date LIKE '%$id%' OR users.phone_number LIKE '%$id%') AND users.enabled=1;";
-        $result=$db->query($query);
-        $row=$result->result_array();
-        return $row;
-    }
+    
     function get_single_inprocess($id)
     {
-        global $db, $dbPrefix, $list;
+        global $wpdb;
+        $prefix=$wpdb->prefix;
         $query="SELECT in_process.ask_email,in_process.id,in_process.case_assign_date,in_process.name,in_process.phone,in_process.email
         ,des1.destination_name as dest_1,cou1.consultant_name,in_process.comments,fee1.status_name,in_process.admin,in_process.university_1,in_process.outcome_destination_1,case_status1.status_name as case_status_1,des2.destination_name as dest_2,
         in_process.case_handler_2,in_process.intake,in_process.university_2,in_process.outcome_destination_2,case_status2.status_name as case_status_2,in_process.course,in_process.case_handler_2,in_process.missing_docs,in_process.final_comments 
-        FROM in_process as in_process 
-        INNER JOIN destination as des1 ON in_process.destination_1=des1.id
-        INNER JOIN destination as des2 ON in_process.destination_2=des2.id
-        INNER JOIN case_status as case_status1 ON in_process.case_status_1=case_status1.id 
-        INNER JOIN case_status as case_status2 ON in_process.case_status_2=case_status2.id 
-        INNER JOIN consultant as cou1 ON in_process.counselor=cou1.id 
-        INNER JOIN fee_status as fee1 ON in_process.fee_status=fee1.id WHERE in_process.enabled=1 AND in_process.id=$id;";
-        $result=$db->query($query);
-        $row=$result->result_array();
-        return $row;
+        FROM {$prefix}in_process as in_process 
+        INNER JOIN {$prefix}destination as des1 ON in_process.destination_1=des1.id
+        INNER JOIN {$prefix}destination as des2 ON in_process.destination_2=des2.id
+        INNER JOIN {$prefix}case_status as case_status1 ON in_process.case_status_1=case_status1.id 
+        INNER JOIN {$prefix}case_status as case_status2 ON in_process.case_status_2=case_status2.id 
+        INNER JOIN {$prefix}consultant as cou1 ON in_process.counselor=cou1.id 
+        INNER JOIN {$prefix}fee_status as fee1 ON in_process.fee_status=fee1.id WHERE in_process.enabled=1 AND in_process.id=$id;";
+        $result=$wpdb->get_results($query);
+        // $row=$result->result_array();
+        return $result;
     }
     function get_single_inprocess_new($id)
     {
-        global $db, $dbPrefix, $list;
+        global $wpdb;
+        $prefix=$wpdb->prefix;
         $query="SELECT in_process.insert_admin,in_process.ask_email,in_process.id,in_process.case_assign_date,in_process.name,in_process.phone,in_process.email
         ,des1.destination_name as dest_1,cou1.consultant_name,in_process.comments,fee1.status_name,in_process.admin,in_process.university_1,in_process.outcome_destination_1,case_status1.status_name as case_status_1,des2.destination_name as dest_2,
         in_process.case_handler_2,in_process.intake,in_process.university_2,in_process.outcome_destination_2,case_status2.status_name as case_status_2,in_process.course,in_process.case_handler_2,in_process.missing_docs,in_process.final_comments 
-        FROM in_process as in_process 
-        INNER JOIN destination as des1 ON in_process.destination_1=des1.id
-        INNER JOIN destination as des2 ON in_process.destination_2=des2.id
-        INNER JOIN case_status as case_status1 ON in_process.case_status_1=case_status1.id 
-        INNER JOIN case_status as case_status2 ON in_process.case_status_2=case_status2.id 
-        INNER JOIN consultant as cou1 ON in_process.counselor=cou1.id 
-        INNER JOIN fee_status as fee1 ON in_process.fee_status=fee1.id WHERE in_process.enabled=1 AND (in_process.id LIKE '%$id%' OR in_process.ask_email LIKE '%$id%' OR in_process.case_assign_date LIKE '%$id%' OR in_process.name LIKE '%$id%' OR in_process.phone LIKE '%$id%' OR in_process.email LIKE '%$id%' OR fee1.status_name LIKE '%$id%' OR case_status1.status_name LIKE '%$id%' OR case_status2.status_name LIKE '%$id%');";
-        $result=$db->query($query);
-        $row=$result->result_array();
-        return $row;
+        FROM {$prefix}in_process as in_process 
+        INNER JOIN {$prefix}destination as des1 ON in_process.destination_1=des1.id
+        INNER JOIN {$prefix}destination as des2 ON in_process.destination_2=des2.id
+        INNER JOIN {$prefix}case_status as case_status1 ON in_process.case_status_1=case_status1.id 
+        INNER JOIN {$prefix}case_status as case_status2 ON in_process.case_status_2=case_status2.id 
+        INNER JOIN {$prefix}consultant as cou1 ON in_process.counselor=cou1.id 
+        INNER JOIN {$prefix}fee_status as fee1 ON in_process.fee_status=fee1.id WHERE in_process.enabled=1 AND (in_process.id LIKE '%$id%' OR in_process.ask_email LIKE '%$id%' OR in_process.case_assign_date LIKE '%$id%' OR in_process.name LIKE '%$id%' OR in_process.phone LIKE '%$id%' OR in_process.email LIKE '%$id%' OR fee1.status_name LIKE '%$id%' OR case_status1.status_name LIKE '%$id%' OR case_status2.status_name LIKE '%$id%');";
+        $result=$wpdb->get_results($query);
+        // $row=$result->result_array();
+        return $result;
     }
     function get_single_completed_new($id)
     {
-        global $db, $dbPrefix, $list;
-        $query="SELECT * FROM completed 
+        global $wpdb;
+        $prefix=$wpdb->prefix;
+        $query="SELECT * FROM {$prefix}completed 
         WHERE `enabled`=1 AND 
         (id LIKE '%$id%' OR phone LIKE '%$id%' OR `date` LIKE '%$id%' OR full_name LIKE '%$id%' OR country LIKE '%$id%' OR university LIKE '%$id%' OR consultant LIKE '%$id%' OR visa_status LIKE '%$id%' OR intake LIKE '%$id%');";
-        $result=$db->query($query);
-        $row=$result->result_array();
-        return $row;
+        $result=$wpdb->get_results($query);
+        // $row=$result->result_array();
+        return $result;
     }
     function get_all_follow_up()
     {
@@ -1159,14 +1138,14 @@ class Functions
     <div class="container-fluid py-4">
           <div class="row">
             <div class="col-12">
-    <form method="POST" action="show_single_user.php" style="margin-top:50px !important;">
+    <form method="POST" style="margin-top:50px !important;">
     <label>Search: </label><br><input class="form-control form-control-sm" type="text" name="user_id"><br><br>
     <div class="text-center d-flex justify-content-center">
     <input class="btn btn-sm btn-primary btn-lg w-40 mt-4 mb-0" type="submit" value="Search"><br>
     </div>
     </form>
     
-    <form method="POST" action="search_result.php">
+    <form method="POST">
     <label>Search With Follow Up: </label><br>
     <select name="type" class="form-control form-control-sm">
       <option selected="selected" value="follow">Follow</option>
@@ -1208,16 +1187,16 @@ class Functions
     <div class="container-fluid py-4">
           <div class="row">
             <div class="col-12">
-    <form method="POST" action="show_single_inprocess.php" style="margin-top:50px !important;">
+    <form method="POST" style="margin-top:50px !important;">
     <label>Search: </label><br><input class="form-control form-control-sm" type="text" name="user_id"><br><br>
     <div class="text-center d-flex justify-content-center">
     <input class="btn btn-sm btn-primary btn-lg w-40 mt-4 mb-0" type="submit" value="Search"><br>
     </div>
     </form>
     
-    <form method="POST" action="search_result_inprocess.php">
+    <form method="POST">
     <label>Search With Follow Up: </label><br>
-    <select name="type" class="form-control form-control-sm">
+    <select name="type_inprocess" class="form-control form-control-sm">
       <option selected="selected" value="follow">Follow</option>
       <option value="followed">Followed</option>
       <option value="visit">Visit</option>
@@ -1225,7 +1204,7 @@ class Functions
       <option value="No Follow">No Follow</option>
     </select><br>
     <br>
-    <input class="form-control form-control-sm" type="date" name="date"><br><br>
+    <input class="form-control form-control-sm" type="date" name="date_inprocess"><br><br>
     <div class="text-center d-flex justify-content-center">
     <input class="btn btn-sm btn-primary btn-lg w-40 mt-4 mb-0" type="submit" value="Search With Follow Up"><br>
     </div>
@@ -1276,7 +1255,7 @@ class Functions
     <div class="container-fluid py-4">
           <div class="row">
             <div class="col-12">
-    <form method="POST" action="show_single_completed.php" style="margin-top:50px !important;">
+    <form method="POST" style="margin-top:50px !important;">
     <label>Search: </label><br><input class="form-control form-control-sm" type="text" name="user_id"><br><br>
     <div class="text-center d-flex justify-content-center">
     <input class="btn btn-sm btn-primary btn-lg w-40 mt-4 mb-0" type="submit" value="Search"><br>

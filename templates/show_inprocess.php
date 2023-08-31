@@ -38,13 +38,36 @@ if(isset($_POST["update_btn"]))
 
 <?php
 
-
-
 $functions->create_forms_inprocess($page_name);
-$outcome=(array)$functions->get_follow_up_data();
+if(isset($_POST["user_id"]))
+{
+    $user_data=$functions->get_single_inprocess_new($_POST["user_id"]);
+}
+else if(isset($_POST["type_inprocess"]))
+{
+    // $_SESSION["type_inprocess"]=$_POST["type_inprocess"];
+    // $_SESSION["date_inprocess"]=$_POST["date_inprocess"];
+    // $_SESSION["date_inprocess"] = date("j/n/Y", strtotime($_SESSION["date_inprocess"]));
+    set_transient( 'type_inprocess', $_POST["type_inprocess"], 600 );
+    set_transient( 'date_inprocess', date("j/n/Y", strtotime($_POST["date_inprocess"])), 600) ;
+    $combined=get_transient( 'type_inprocess' )." ".get_transient( 'date_inprocess' );
+    $user_data=$functions->get_follow_inprocess_new(strtolower($combined));
+    // echo "here";
+    // echo get_transient( 'date_inprocess' );
+    
+} 
+else if(!(false === get_transient( 'date_inprocess' )))
+{
+    $combined=get_transient( 'type_inprocess' )." ".get_transient( 'date_inprocess' );
+    $user_data=$functions->get_follow_inprocess_new(strtolower($combined));
+}
+else
+{
+    $user_data=$functions->get_follow_up_data();
+}
+// var_dump($user_data);
 $functions->show_inprocess_table();
-
-$functions->show_inprocess_data($outcome);
+$functions->show_inprocess_data($user_data);
 
 ?>
 

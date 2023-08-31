@@ -28,10 +28,17 @@ if(isset($_POST["update_btn"]))
 
 // if(checkPrivilage($_SESSION["user_type"],"admin") || checkPrivilage($_SESSION["user_type"],"accounts") || checkPrivilage($_SESSION["user_type"],"case_admin"))
 // {
-$outcome=$functions->selectData("completed","enabled=1");
 $functions->create_forms_completed($page_name);
-$functions->show_completed_table();
+if(isset($_POST["user_id"]))
+{
+    $user_data=$functions->get_single_completed_new($_POST["user_id"]);
+}
+else
+{
+    $user_data=$functions->selectData("completed","enabled=1");   
+}
 
-$functions->show_completed_data($outcome);
+$functions->show_completed_table();
+$functions->show_completed_data($user_data);
 // }
 ?>

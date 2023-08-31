@@ -85,10 +85,35 @@ class show_leads
             $data["enabled"]=0;
             $functions->disableData("user_info",$data,"id=".$_POST["delete"]);
         }
-        $user_data=$functions->get_all_data($this->min,$this->max);
         $functions->create_forms($this->page_name);
+        if(isset($_POST["user_id"]))
+        {
+            $user_data=$functions->get_single_user_data_new($_POST["user_id"]);
+        }
+        else if(isset($_POST["type"]))
+        {
+            // $_SESSION["type"]=$_POST["type"];
+            // $_SESSION["date"]=$_POST["date"];
+            // $_SESSION["date"] = date("j/n/Y", strtotime($_SESSION["date"]));
+            set_transient( 'type', $_POST["type"], 600 );
+            set_transient( 'date', date("j/n/Y", strtotime($_POST["date"])), 600) ;
+            $combined=get_transient( 'type' )." ".get_transient( 'date' );
+            $user_data=$functions->get_all_data_follow_new(strtolower($combined));
+            
+        }
+        else if(!(false === get_transient( 'date' )))
+        {
+            $combined=get_transient( 'type' )." ".get_transient( 'date' );
+            $user_data=$functions->get_all_data_follow_new(strtolower($combined));
+        }
+        else
+        {
+            $user_data=$functions->get_all_data($this->min,$this->max);
+            
+        }
         $functions->show_leads_table();
         $functions->show_leads_data($user_data);
+        
     }
 }
 ?>
